@@ -162,3 +162,5 @@ which is much faster for larger inputs.
 - The equality `str1 + str2 == str2 + str1` is a powerful way to verify that two strings share the same repeating pattern.
 - The length of the answer is determined by the **Greatest Common Divisor (GCD)** of the string lengths.
 - Using the Euclidean Algorithm further optimizes the solution.
+
+Solved Date:6/8/2026
