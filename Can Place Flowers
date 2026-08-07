@@ -1,0 +1,168 @@
+605. Can Place Flowers
+
+Problem Statement
+
+You have a flowerbed represented by an integer array.
+
+* 0 represents an empty plot.
+* 1 represents a plot that already contains a flower.
+
+Flowers cannot be planted in adjacent plots.
+
+Given an integer array `flowerbed` and an integer `n`, determine whether it is possible to plant `n` new flowers without violating the no-adjacent-flowers rule.
+
+Return `True` if it is possible; otherwise, return `False`.
+
+---
+
+Pattern
+
+* Greedy Algorithm
+* Array Traversal
+* Simulation
+
+---
+
+Data Structures Used
+
+* List (Array)
+
+---
+
+Intuition
+
+A flower can only be planted if:
+
+* The current plot is empty.
+* The left plot is either empty or does not exist.
+* The right plot is either empty or does not exist.
+
+Whenever a valid position is found, immediately plant a flower and update the flowerbed. This greedy choice is always optimal because planting at the earliest valid position never decreases the maximum number of flowers that can be planted later.
+
+---
+
+Why This Approach Works
+
+The decision to plant at the current position depends only on three plots:
+
+* Left neighbor
+* Current plot
+* Right neighbor
+
+If all required conditions are satisfied, planting the flower immediately is always safe.
+
+After planting, the current plot is updated to `1`, preventing adjacent flowers from being planted in subsequent iterations.
+
+This guarantees that the flowerbed always satisfies the problem constraints while maximizing the number of flowers planted.
+
+---
+
+Algorithm
+
+1. Traverse the flowerbed from left to right.
+2. For every position:
+
+   * If it is the first plot, check only the current and right plots.
+   * If it is the last plot, check only the current and left plots.
+   * Otherwise, check the left, current, and right plots.
+3. If planting is possible:
+
+   * Plant the flower by updating the current plot to `1`.
+   * Decrement `n`.
+4. Continue until the traversal is complete.
+5. If `n` becomes `0` or less, return `True`; otherwise, return `False`.
+
+---
+
+Python Solution
+
+```python
+class Solution:
+    def canPlaceFlowers(self, flowerbed: List[int], n: int) -> bool:
+
+        l = 0
+        r = len(flowerbed)
+
+        while l < r:
+
+            if l > 0 and l < r - 1:
+
+                if flowerbed[l - 1] == 0 and flowerbed[l] == 0 and flowerbed[l + 1] == 0:
+                    n -= 1
+                    flowerbed[l] = 1
+
+            elif l == 0 and l < r - 1:
+
+                if flowerbed[l] == 0 and flowerbed[l + 1] == 0:
+                    n -= 1
+                    flowerbed[l] = 1
+
+            else:
+
+                if flowerbed[l] == 0 and flowerbed[l - 1] == 0:
+                    n -= 1
+                    flowerbed[l] = 1
+
+            l += 1
+
+        if n > 0:
+            return False
+
+        return True
+```
+
+---
+
+Complexity Analysis
+
+Time Complexity
+
+* The flowerbed is traversed only once.
+
+Overall Time Complexity:
+
+O(n)
+
+Space Complexity
+
+* Only a few variables are used.
+* The flowerbed is modified in place.
+
+Overall Space Complexity:
+
+O(1)
+
+---
+
+Can This Solution Be Optimized?
+
+Time Complexity
+
+No.
+
+Every plot must be inspected at least once to determine whether a flower can be planted. Therefore, O(n) is the optimal time complexity.
+
+Space Complexity
+
+No.
+
+The algorithm modifies the input array directly and uses only constant extra memory.
+
+Hence, O(1) auxiliary space is optimal.
+
+---
+
+Interview Insight
+
+The key observation is that a planting decision depends only on the current plot and its immediate neighbors.
+
+This is a Greedy Algorithm because whenever a valid position is found, planting immediately is always the optimal decision. Updating the flowerbed after planting naturally prevents adjacent flowers from being planted.
+
+---
+
+Key Takeaways
+
+* Handle the first and last plots carefully since they have only one neighbor.
+* Update the flowerbed immediately after planting.
+* A greedy strategy is sufficient because local optimal choices lead to the global optimum.
+* The final solution achieves the optimal time complexity of O(n) and auxiliary space complexity of O(1).
