@@ -1,0 +1,135 @@
+1431. Kids With the Greatest Number of Candies
+
+Problem Statement
+
+There are `n` kids with candies. You are given an integer array `candies`, where `candies[i]` represents the number of candies the `i`th kid has, and an integer `extraCandies`, representing the number of extra candies available.
+
+Return a boolean array `result` of length `n`, where `result[i]` is `True` if, after giving all the extra candies to the `i`th kid, that kid will have the greatest number of candies among all the kids. Otherwise, return `False`.
+
+Multiple kids can have the greatest number of candies.
+
+---
+
+Pattern
+
+* Array Traversal
+* Simulation
+* Preprocessing (Finding the Maximum Element)
+
+---
+
+Data Structures Used
+
+* List (Array)
+* Boolean List (Result Array)
+
+---
+
+Intuition
+
+The only value that matters is the current maximum number of candies among all the kids.
+
+If a kid receives all the extra candies and their total becomes greater than or equal to the current maximum, then that kid can have the greatest number of candies. Otherwise, they cannot.
+
+Instead of comparing every kid with every other kid, first find the maximum value once and then compare each kid's total after adding the extra candies.
+
+---
+
+Why This Approach Works
+
+The kid who currently has the maximum number of candies sets the benchmark.
+
+For every kid:
+
+Current Candies + Extra Candies >= Maximum Candies
+
+If the above condition is true, then the answer for that kid is `True`; otherwise, it is `False`.
+
+Since every kid is checked exactly once after finding the maximum, the solution is both simple and efficient.
+
+---
+
+Algorithm
+
+1. Find the maximum number of candies in the array.
+2. Create an empty boolean list.
+3. Traverse through each element in the candies array.
+4. If `candies[i] + extraCandies >= maximumCandies`, append `True` to the result list.
+5. Otherwise, append `False`.
+6. Return the boolean list.
+
+---
+
+Python Solution
+
+```python
+class Solution:
+    def kidsWithCandies(self, candies: List[int], extraCandies: int) -> List[bool]:
+        max_int = max(candies)
+        list_bool = []
+
+        for i in candies:
+            if i + extraCandies >= max_int:
+                list_bool.append(True)
+            else:
+                list_bool.append(False)
+
+        return list_bool
+```
+
+---
+
+Complexity Analysis
+
+Time Complexity
+
+* Finding the maximum element: O(n)
+* Traversing the array: O(n)
+
+Overall Time Complexity:
+
+O(n)
+
+Space Complexity
+
+* Result boolean list stores one value for each kid.
+
+Overall Space Complexity:
+
+O(n)
+
+---
+
+Can This Solution Be Optimized?
+
+Time Complexity
+
+No.
+
+Every kid must be checked at least once to determine the result. Since the output itself contains `n` boolean values, any algorithm must inspect all the elements.
+
+Therefore, O(n) is the optimal time complexity.
+
+Space Complexity
+
+No.
+
+The problem requires returning a boolean array of size `n`. Hence, O(n) auxiliary space for the output is unavoidable.
+
+---
+
+Interview Insight
+
+A common mistake is to compare each kid with every other kid, resulting in an O(n²) solution.
+
+Instead, compute the maximum number of candies only once and use it as a reference for every comparison. This reduces the time complexity to O(n), which is the optimal solution.
+
+---
+
+Key Takeaways
+
+* Compute the maximum value once before iterating.
+* Compare each kid's candies after adding the extra candies with the maximum value.
+* Avoid unnecessary nested loops.
+* The solution is optimal with O(n) time and O(n) space.
+* Preprocessing is often a useful technique to eliminate repeated computations.
