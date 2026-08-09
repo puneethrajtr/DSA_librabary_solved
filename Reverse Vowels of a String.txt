@@ -1,0 +1,367 @@
+345. Reverse Vowels of a String
+
+Problem Statement
+
+Given a string `s`, reverse only the vowels in the string and return the resulting string.
+
+The vowels are:
+
+`a, e, i, o, u`
+
+They can appear in both lowercase and uppercase.
+
+All consonants and other characters must remain in their original positions.
+
+Example:
+
+Input:
+`IceCreAm`
+
+Vowels:
+`I, e, e, A`
+
+Reversed vowels:
+`A, e, e, I`
+
+Output:
+`AceCreIm`
+
+---
+
+Pattern
+
+* Two Pointers
+* String Manipulation
+* Stack (Alternative Approach)
+
+---
+
+Data Structures Used
+
+Approach 1:
+
+* Set
+* Stack
+* String
+
+Approach 2:
+
+* Set
+* List (Mutable Character Array)
+
+---
+
+Core Observation
+
+Only the vowels need to change their positions.
+
+The consonants and other characters must remain exactly where they are.
+
+Therefore, the main task is to find vowels from the two ends of the string and reverse their positions.
+
+---
+
+APPROACH 1: Set + Stack
+
+Intuition
+
+A stack follows the Last-In-First-Out (LIFO) principle.
+
+If all vowels are stored in a stack while traversing the string from left to right, the last vowel encountered will be available first.
+
+For example:
+
+Input:
+`IceCreAm`
+
+Vowels encountered:
+
+`I, e, e, A`
+
+Stack:
+
+`[I, e, e, A]`
+
+When processing the string again, whenever a vowel is encountered, pop the top element from the stack.
+
+This automatically places the vowels in reverse order.
+
+---
+
+Algorithm - Approach 1
+
+1. Create a set containing all uppercase and lowercase vowels.
+2. Create an empty stack.
+3. Traverse the string and push every vowel into the stack.
+4. Traverse the string again.
+5. If the current character is a vowel:
+
+   * Pop a vowel from the stack.
+   * Add the popped vowel to the result.
+6. If the current character is not a vowel:
+
+   * Add the original character to the result.
+7. Return the resulting string.
+
+---
+
+Python Solution - Approach 1
+
+```python
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        vow_set = {'A', 'E', 'I', 'O', 'U',
+                   'a', 'e', 'i', 'o', 'u'}
+
+        vow_stack = []
+
+        for i in range(len(s)):
+            if s[i] in vow_set:
+                vow_stack.append(s[i])
+
+        rev_s = ''
+
+        for i in range(len(s)):
+            if not vow_stack:
+                return rev_s + s[i:]
+
+            elif s[i] in vow_set:
+                rev_s += vow_stack.pop()
+
+            else:
+                rev_s += s[i]
+
+        return rev_s
+```
+
+---
+
+Complexity - Approach 1
+
+Time Complexity:
+
+O(n)
+
+The string is traversed twice, but:
+
+O(n) + O(n) = O(n)
+
+Space Complexity:
+
+O(n)
+
+The stack can contain all characters in the worst case if the string consists entirely of vowels.
+
+---
+
+Benefits of Approach 1
+
+* Easy to understand.
+* Naturally uses the LIFO property of a stack to reverse the vowels.
+* Set provides efficient vowel membership checking.
+* Good approach for understanding how stacks can be used to reverse elements.
+
+Drawback:
+
+* The stack is not actually necessary.
+* It requires additional memory for storing all vowels.
+* The string is traversed twice.
+
+---
+
+APPROACH 2: Two Pointers
+
+Intuition
+
+The stack approach works, but we can simplify the problem.
+
+To reverse the vowels, we need:
+
+First vowel <-> Last vowel
+
+Second vowel <-> Second-last vowel
+
+Third vowel <-> Third-last vowel
+
+This naturally suggests using two pointers.
+
+One pointer starts from the left and another starts from the right.
+
+The left pointer searches for a vowel from the beginning.
+
+The right pointer searches for a vowel from the end.
+
+When both pointers point to vowels, swap them.
+
+Then move both pointers inward.
+
+---
+
+Algorithm - Approach 2
+
+1. Create a set containing uppercase and lowercase vowels.
+2. Convert the string into a list so that characters can be modified.
+3. Initialize:
+
+   * `left = 0`
+   * `right = len(s) - 1`
+4. While `left < right`:
+
+   * If both `char[left]` and `char[right]` are vowels:
+
+     * Swap them.
+     * Move both pointers inward.
+   * If `char[left]` is not a vowel:
+
+     * Move `left` forward.
+   * If `char[right]` is not a vowel:
+
+     * Move `right` backward.
+5. Convert the character list back into a string.
+6. Return the resulting string.
+
+---
+
+Python Solution - Approach 2
+
+```python
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        vowels = {'A', 'E', 'I', 'O', 'U',
+                  'a', 'e', 'i', 'o', 'u'}
+
+        left = 0
+        right = len(s) - 1
+
+        chars = list(s)
+
+        while left < right:
+
+            if chars[left] in vowels and chars[right] in vowels:
+                chars[left], chars[right] = chars[right], chars[left]
+                left += 1
+                right -= 1
+
+            elif chars[left] not in vowels:
+                left += 1
+
+            elif chars[right] not in vowels:
+                right -= 1
+
+        return ''.join(chars)
+```
+
+---
+
+Complexity - Approach 2
+
+Time Complexity:
+
+O(n)
+
+Both pointers move only toward the center of the string.
+
+Each character is processed at most once by the pointers.
+
+The final `join()` operation also takes O(n).
+
+Overall:
+
+O(n)
+
+Space Complexity:
+
+O(n)
+
+Python strings are immutable, so the original string is converted into a list:
+
+`chars = list(s)`
+
+The list requires O(n) memory.
+
+---
+
+Benefits of Approach 2
+
+* More direct solution to the problem.
+* Does not require a separate stack.
+* Uses the natural relationship between the first and last vowels.
+* Only one main traversal is required.
+* Easier to explain as a standard Two-Pointer technique.
+* The algorithm is simpler once the two-pointer pattern is recognized.
+
+---
+
+Comparison of Both Approaches
+
+Approach 1: Set + Stack
+
+Time:
+O(n)
+
+Space:
+O(n)
+
+Main idea:
+Store all vowels and retrieve them in reverse order using LIFO.
+
+Approach 2: Set + Two Pointers
+
+Time:
+O(n)
+
+Space:
+O(n) in Python because the string must be converted into a mutable list.
+
+Main idea:
+Find vowels from both ends and swap them directly.
+
+---
+
+Which Approach Is Better?
+
+The Two-Pointer approach is preferable for this problem.
+
+The Stack approach is correct and demonstrates a good understanding of the LIFO principle, but the stack is unnecessary because the vowels can be reversed directly by pairing the first vowel with the last vowel.
+
+The Two-Pointer approach therefore provides a simpler and more natural solution.
+
+---
+
+Interview Insight
+
+If an interviewer asks why the stack is not necessary, the key observation is:
+
+To reverse a sequence, the first element needs to exchange positions with the last element, the second with the second-last, and so on.
+
+That is exactly what two pointers can accomplish without explicitly storing the reversed sequence.
+
+Also remember that Python strings are immutable. Therefore, even though the two-pointer algorithm conceptually modifies the string in place, Python requires converting it into a list first.
+
+---
+
+Key Takeaways
+
+* Only vowels need to be modified; all other characters must remain unchanged.
+* A set provides efficient vowel membership checking.
+* A stack can reverse vowels using the LIFO principle.
+* Two pointers can reverse the vowels directly without requiring a separate stack.
+* The Two-Pointer technique is the preferred approach for this problem.
+* In Python, strings are immutable, so a character list is required for direct swapping.
+* Both approaches run in O(n) time.
+* Both implementations use O(n) space in Python.
+* The important pattern to recognize is: first matching element <-> last matching element.
+
+---
+
+Personal Learning Note
+
+Initial Approach:
+Set + Stack
+
+Improved Approach:
+Set + Two Pointers
+
+The first approach was correct, but after analyzing the problem further, the stack was identified as unnecessary. The two-pointer approach provides a cleaner and more direct way to reverse only the vowels.
+
+This problem helped reinforce the Two-Pointer pattern and the importance of recognizing when an additional data structure can be eliminated.
