@@ -1,0 +1,286 @@
+283. Move Zeroes
+
+Problem Statement
+
+Given an integer array nums, move all zeroes to the end of the array while maintaining the relative order of all non-zero elements.
+
+The operation must be performed in-place without creating a copy of the array.
+
+Example:
+
+Input:
+[0,1,0,3,12]
+
+Output:
+[1,3,12,0,0]
+
+---
+
+Pattern
+
+Two Pointers
+
+---
+
+Data Structure Used
+
+Array / List
+
+No additional data structure is required.
+
+---
+
+APPROACH 1: Remove Zero and Append to End
+
+Intuition
+
+Traverse the array and whenever a zero is found, remove it from its current position and append it to the end.
+
+Algorithm
+
+1. Start traversing the array.
+2. If the current element is zero:
+
+   * Remove the zero from its current position.
+   * Append zero to the end.
+   * Reduce the effective traversal range.
+3. If the current element is non-zero:
+
+   * Move to the next position.
+4. Continue until the required portion of the array is processed.
+
+Python Implementation
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        l = 0
+        r = len(nums)
+        
+        while l < r:
+            if nums[l] == 0:
+                nums.pop(l)
+                nums.append(0)
+                r -= 1
+            else:
+                l += 1
+```
+
+Complexity
+
+Time Complexity:
+
+O(n²)
+
+The problem is the `pop(l)` operation.
+
+When an element is removed from the middle or beginning of a Python list, the elements after it must be shifted.
+
+Therefore, one `pop(l)` can take O(n) time.
+
+If this happens many times, the worst-case complexity becomes O(n²).
+
+Space Complexity:
+
+O(1)
+
+No additional array proportional to the input size is created.
+
+Benefits
+
+* Simple to understand.
+* Directly follows the problem statement.
+* Works in-place.
+* Preserves the relative order of non-zero elements.
+
+Drawback
+
+Repeatedly removing elements from a Python list is expensive because elements have to be shifted.
+
+---
+
+APPROACH 2: Two Pointers
+
+Intuition
+
+Instead of removing zeroes, keep all non-zero elements in their correct relative order and move them toward the beginning of the array.
+
+Use two pointers:
+
+l:
+Represents the position where the next non-zero element should be placed.
+
+r:
+Traverses the array and searches for non-zero elements.
+
+Whenever `r` finds a non-zero element while `l` points to a zero, swap them.
+
+Example:
+
+[0,1,0,3,12]
+
+Initially:
+
+l = 0
+r = 0
+
+The first element is zero, so move r.
+
+r finds 1:
+
+[0,1,0,3,12]
+↑ ↑
+l r
+
+Swap:
+
+[1,0,0,3,12]
+
+Move both pointers.
+
+Continue the same process until the entire array is processed.
+
+Final result:
+
+[1,3,12,0,0]
+
+---
+
+Algorithm
+
+1. Initialize two pointers `l` and `r` to 0.
+2. Traverse the array using `r`.
+3. If both `nums[l]` and `nums[r]` are zero:
+
+   * Move `r` forward.
+4. If `nums[l]` is zero and `nums[r]` is non-zero:
+
+   * Swap the two elements.
+   * Move both pointers forward.
+5. If `nums[l]` is already non-zero:
+
+   * Move both pointers forward.
+6. Continue until `r` reaches the end of the array.
+7. The array is now modified in-place.
+
+Python Implementation
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        l = 0
+        r = 0
+
+        while r < len(nums):
+            if nums[l] == 0 and nums[r] == 0:
+                r += 1
+
+            elif nums[l] == 0 and nums[r] != 0:
+                nums[l], nums[r] = nums[r], nums[l]
+                l += 1
+                r += 1
+
+            else:
+                l += 1
+                r += 1
+```
+
+Complexity
+
+Time Complexity:
+
+O(n)
+
+The `r` pointer moves from the beginning to the end of the array.
+
+Although `l` is also incremented, neither pointer moves backward.
+
+Therefore, the total number of operations is linear.
+
+Time Complexity:
+
+O(n)
+
+Space Complexity:
+
+O(1)
+
+Only two pointer variables and a constant amount of temporary information are used.
+
+No additional array is created.
+
+Space Complexity:
+
+O(1)
+
+---
+
+Why the Two-Pointer Approach Is Better
+
+The first approach repeatedly removes elements from the list.
+
+That causes shifting operations and can result in O(n²) time.
+
+The two-pointer approach does not remove or insert elements.
+
+It directly rearranges the existing array using swaps.
+
+Therefore:
+
+First Approach:
+O(n²) time
+O(1) space
+
+Two-Pointer Approach:
+O(n) time
+O(1) space
+
+The two-pointer approach is therefore asymptotically optimal.
+
+---
+
+Important Learning
+
+An operation being O(1) does not mean the entire algorithm is O(1).
+
+For example:
+
+```python
+r += 1
+```
+
+is O(1).
+
+But if we execute:
+
+```python
+r += 1
+```
+
+n times, the total work is:
+
+O(1) × n = O(n)
+
+Therefore, the fact that the algorithm only increments variables does not make the entire algorithm O(1).
+
+The complete traversal determines the time complexity.
+
+---
+
+Key Takeaways
+
+* Use two pointers when rearranging elements in an array in-place.
+* Avoid repeated `pop(0)` or middle-position removals when possible.
+* Python list removal can require shifting elements.
+* Preserving relative order is important in this problem.
+* `l` tracks the next position for a non-zero element.
+* `r` scans the array for non-zero elements.
+* Time complexity of the optimized solution is O(n).
+* Auxiliary space complexity is O(1).
+* O(1) work repeated n times results in O(n), not O(1).
+
+Final Optimal Complexity:
+
+Time: O(n)
+
+Space: O(1)
