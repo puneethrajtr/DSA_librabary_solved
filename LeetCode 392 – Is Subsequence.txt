@@ -1,0 +1,326 @@
+LeetCode 392 – Is Subsequence
+
+Problem Statement
+
+Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+
+A subsequence is a sequence that can be formed from another string by deleting some or none of its characters without changing the order of the remaining characters.
+
+Example:
+
+s = "abc"
+t = "ahbgdc"
+
+Output:
+true
+
+Explanation:
+
+We can find 'a', then 'b', and then 'c' in t while maintaining their original order.
+
+Another example:
+
+s = "axc"
+t = "ahbgdc"
+
+Output:
+false
+
+Approach – Two Pointers
+
+This problem can be solved efficiently using two pointers.
+
+Pointer l tracks the current character that needs to be matched in s.
+
+Pointer r scans through t.
+
+Rules:
+
+1. If s[l] == t[r], both characters match.
+   Move both pointers forward.
+
+2. If s[l] != t[r], the current character in t is not useful.
+   Move only r forward.
+
+The pointer r never moves backward because a subsequence must maintain the original order of characters.
+
+Algorithm
+
+1. If s is empty, return true.
+
+2. If t is empty and s is not empty, return false.
+
+3. Initialize two pointers:
+   l = 0
+   r = 0
+
+4. Continue while r is less than the length of t.
+
+5. Compare the current characters of s and t.
+
+6. If they are equal:
+   Increment l and r.
+
+7. Otherwise:
+   Increment only r.
+
+8. If l reaches the length of s, all characters of s have been matched.
+   Return true.
+
+9. If t is completely scanned before all characters of s are matched, return false.
+
+Python Implementation
+
+class Solution:
+def isSubsequence(self, s: str, t: str) -> bool:
+if len(s) == 0:
+return True
+elif len(t) == 0:
+return False
+
+```
+    l = 0
+    r = 0
+
+    while r < len(t):
+        if s[l] == t[r]:
+            l += 1
+            r += 1
+        else:
+            r += 1
+
+        if l == len(s):
+            return True
+
+    return False
+```
+
+Java Implementation
+
+class Solution {
+
+```
+public boolean isSubsequence(String s, String t) {
+
+    if (s.length() == 0) {
+        return true;
+    }
+    else if (t.length() == 0) {
+        return false;
+    }
+
+    int l = 0;
+    int r = 0;
+
+    while (r < t.length()) {
+
+        if (s.charAt(l) == t.charAt(r)) {
+            l++;
+            r++;
+        }
+        else {
+            r++;
+        }
+
+        if (l == s.length()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+```
+
+}
+
+Example Walkthrough
+
+Input:
+
+s = "abc"
+t = "ahbgdc"
+
+Initial state:
+
+l = 0
+r = 0
+
+s[l] = 'a'
+t[r] = 'a'
+
+They match.
+
+Move both pointers:
+
+l = 1
+r = 1
+
+Now:
+
+s[l] = 'b'
+t[r] = 'h'
+
+They do not match.
+
+Move only r:
+
+r = 2
+
+t[r] = 'b'
+
+Now:
+
+s[l] = 'b'
+t[r] = 'b'
+
+They match.
+
+Move both:
+
+l = 2
+r = 3
+
+Now:
+
+s[l] = 'c'
+t[r] = 'g'
+
+No match.
+
+Move r.
+
+Eventually:
+
+t[r] = 'c'
+
+The characters match.
+
+l becomes 3.
+
+Since:
+
+l == s.length()
+
+all characters of s have been matched.
+
+Therefore:
+
+Output = true
+
+Why Does This Work?
+
+The main property of a subsequence is that the order of characters must remain unchanged.
+
+The algorithm scans t from left to right and searches for each character of s in order.
+
+If the current character of t is not what we need, we skip it.
+
+If it matches the required character of s, we move to the next character of s.
+
+Because r only moves forward, the order of the matched characters is automatically preserved.
+
+Correctness
+
+If the algorithm returns true, it means every character of s has been matched with a character in t.
+
+Since the pointer in t always moves forward, the matched characters occur in the same order.
+
+Therefore, s is a subsequence of t.
+
+If the algorithm returns false, t has been completely scanned before all characters of s could be matched.
+
+Therefore, s cannot be a subsequence of t.
+
+Time Complexity
+
+O(n)
+
+where n is the length of t.
+
+The pointer r moves through t at most once.
+
+The pointer l also only moves forward.
+
+Therefore, the total running time is linear.
+
+More precisely:
+
+Time = O(length of t)
+
+Space Complexity
+
+O(1)
+
+Only two integer pointers are used:
+
+l
+r
+
+No additional array, list, stack, or other data structure is required.
+
+Is O(n) Optimal?
+
+Yes.
+
+For the general single-query version of this problem, O(n) is asymptotically optimal.
+
+In the worst case, every character of t may need to be examined.
+
+For example:
+
+s = "z"
+t = "aaaaaaaaaaaaaaaaaaaz"
+
+The algorithm may need to scan almost the entire string before finding 'z'.
+
+Therefore, Ω(n) work may be necessary.
+
+Our algorithm takes O(n), so it is asymptotically optimal.
+
+Python vs Java
+
+The algorithm is identical in both languages.
+
+Python:
+
+s[l]
+t[r]
+
+Java:
+
+s.charAt(l)
+t.charAt(r)
+
+The language syntax is different, but the underlying algorithm, pointer movement, correctness, time complexity, and space complexity are the same.
+
+Key Learning
+
+1. Two pointers are useful when comparing two sequences while preserving order.
+
+2. A subsequence does not require characters to be adjacent.
+
+3. A subsequence must preserve the relative order of characters.
+
+4. When the current character of t does not match the required character of s, only the pointer for t needs to move.
+
+5. When a match is found, both pointers can move forward.
+
+6. O(n) is optimal for the general single-query version because t may need to be scanned completely.
+
+Final Takeaway
+
+The core idea of LeetCode 392 is:
+
+"Scan t from left to right and try to match every character of s in order."
+
+This naturally leads to a two-pointer solution.
+
+Python:
+Time Complexity = O(n)
+Space Complexity = O(1)
+
+Java:
+Time Complexity = O(n)
+Space Complexity = O(1)
+
+Both implementations use the same optimal algorithm.
