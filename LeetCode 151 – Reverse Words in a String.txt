@@ -1,0 +1,300 @@
+LeetCode 151 – Reverse Words in a String
+
+Problem Statement
+
+Given an input string s, reverse the order of the words.
+
+A word is defined as a sequence of non-space characters. The words in s are separated by at least one space.
+
+The returned string must contain:
+
+• Words in reverse order.
+• Exactly one space between consecutive words.
+• No leading spaces.
+• No trailing spaces.
+• No extra spaces caused by multiple spaces in the input.
+
+Example 1
+
+Input:
+s = "the sky is blue"
+
+Output:
+"blue is sky the"
+
+Example 2
+
+Input:
+s = "  hello world  "
+
+Output:
+"world hello"
+
+Approach – Extract Words, Reverse, and Join
+
+The approach consists of three main stages:
+
+1. Extract all valid words from the input string.
+2. Reverse the order of the extracted words.
+3. Join the reversed words using exactly one space.
+
+A temporary variable called word is used to construct the current word character by character.
+
+A list called words is used to store the completed words.
+
+Algorithm
+
+1. Initialize an empty string:
+
+   word = ''
+
+2. Initialize an empty list:
+
+   words = []
+
+3. Iterate through every character of the input string.
+
+4. If the current character is a space and word is not empty:
+   • Add word to words.
+   • Reset word to an empty string.
+
+5. If the current character is not a space:
+   • Add the character to word.
+
+6. Handle the final character separately if it is not a space.
+   This ensures that the final word is stored even when the input does not end with a space.
+
+7. After processing the string, check whether words contains any elements.
+
+8. Reverse the words list.
+
+9. Join all words using a single space.
+
+10. Return the resulting string.
+
+11. If no words were found, return an empty string.
+
+Python Implementation
+
+class Solution:
+def reverseWords(self, s: str) -> str:
+
+```
+    word = ''
+    words = []
+
+    for i in range(len(s)):
+
+        if i == len(s) - 1 and s[i] != ' ':
+            word += s[i]
+            words.append(word)
+
+        elif s[i] == ' ' and len(word) > 0:
+            words.append(word)
+            word = ''
+
+        elif s[i] != ' ':
+            word += s[i]
+
+    if len(words) > 0:
+        words.reverse()
+        s = ' '.join(words)
+        return s
+    else:
+        return ''
+```
+
+How the Algorithm Handles Spaces
+
+Leading Spaces
+
+Example:
+
+"  hello world"
+
+When a space is encountered while word is empty, nothing is added to words.
+
+Therefore, leading spaces are ignored.
+
+Multiple Spaces
+
+Example:
+
+"hello   world"
+
+When the first space after "hello" is encountered, "hello" is added.
+
+The following spaces occur while word is empty, so they are ignored.
+
+Therefore, multiple spaces do not create empty words.
+
+Trailing Spaces
+
+Example:
+
+"hello world  "
+
+After "world" is stored, the remaining spaces are ignored because word is empty.
+
+Therefore, the result contains no trailing spaces.
+
+No Space After the Final Word
+
+Example:
+
+"hello world"
+
+The final character 'd' is not followed by a space.
+
+The condition:
+
+i == len(s) - 1 and s[i] != ' '
+
+handles this case and adds "world" to the list.
+
+Example Walkthrough
+
+Input:
+
+"  hello   world  "
+
+Step 1 – Extract words:
+
+words = ["hello", "world"]
+
+Step 2 – Reverse the list:
+
+words = ["world", "hello"]
+
+Step 3 – Join using one space:
+
+"world hello"
+
+Final Output:
+
+"world hello"
+
+Why Does This Approach Work?
+
+The problem has two independent requirements:
+
+1. Identify the actual words while ignoring unnecessary spaces.
+2. Reverse the order of those words.
+
+The algorithm first solves the first requirement by storing only non-empty words.
+
+Then it solves the second requirement by reversing the list.
+
+Finally, join() places exactly one space between every word.
+
+Because empty strings are never added to the list, the final result cannot contain unwanted leading, trailing, or repeated spaces.
+
+Correctness
+
+Every non-space character is added to the current word.
+
+Whenever a space is encountered after a non-empty word, that complete word is stored in the words list.
+
+Therefore, every valid word from the input is stored exactly once.
+
+The list is then reversed, so the words appear in the opposite order.
+
+Finally, the words are joined using exactly one space.
+
+Therefore, the returned string satisfies all requirements of the problem.
+
+Time Complexity
+
+O(n)
+
+where n is the length of the input string.
+
+The string is scanned once:
+
+O(n)
+
+The list of words is reversed:
+
+O(k)
+
+where k is the number of words.
+
+Since k <= n:
+
+O(k) <= O(n)
+
+The words are then joined:
+
+O(n)
+
+Therefore:
+
+O(n) + O(k) + O(n)
+
+= O(n)
+
+The constant factors are ignored in Big-O notation.
+
+Final Time Complexity:
+
+O(n)
+
+Space Complexity
+
+O(n)
+
+The words list stores the words extracted from the input.
+
+In the worst case, the input can contain many words, so the total amount of stored character data can be proportional to n.
+
+The temporary word can also contain up to O(n) characters in the worst case.
+
+Therefore:
+
+Auxiliary Space Complexity = O(n)
+
+Why Not Use Repeated String Concatenation?
+
+An alternative idea is to find each word and repeatedly prepend it to a result string.
+
+For example:
+
+result = new_word + " " + result
+
+However, Python strings are immutable.
+
+Therefore, repeatedly creating larger strings can require repeatedly copying existing characters.
+
+In the worst case, this can lead to O(n²) time.
+
+For this reason, the list-based approach is preferable in Python.
+
+The list stores the words efficiently, and join() constructs the final string once.
+
+Final Complexity
+
+Time Complexity:
+O(n)
+
+Auxiliary Space Complexity:
+O(n)
+
+This is a clean and efficient practical solution for Python.
+
+Key Learning
+
+1. Separate the problem into word extraction and word reversal.
+
+2. Ignore spaces when no word has been accumulated.
+
+3. Handle the final word when the input does not end with a space.
+
+4. Use a list to store words instead of repeatedly concatenating large strings.
+
+5. Use reverse() to reverse the word order.
+
+6. Use join() to create the final string with exactly one space between words.
+
+7. O(n) time is optimal because the input must be processed.
+
+8. In Python, this approach uses O(n) auxiliary space because the words need to be stored before reversing their order.
