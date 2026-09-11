@@ -1,0 +1,229 @@
+LeetCode 3871 – Count Commas in Range II
+
+Problem Statement
+
+You are given an integer n. Return the total number of commas used when
+writing all integers from [1, n] inclusive in standard number
+formatting.
+
+A comma is inserted after every three digits from the right. Numbers
+with fewer than 4 digits contain no commas.
+
+Examples
+
+Input: n = 1002 Output: 3
+
+Input: n = 998 Output: 0
+
+Constraint
+
+1 <= n <= 10^15
+
+Approach 1 – Recursive Approach (My Approach)
+
+Idea
+
+This problem is an extension of LeetCode 3870 – Count Commas in Range.
+
+For the previous problem, every number from 1,000 through n contributed
+one comma. In this problem, n can be as large as 10^15, so numbers can
+contain multiple commas.
+
+An additional comma starts appearing whenever we cross a power of 1,000:
+
+1,000 -> 1 comma 1,000,000 -> 2 commas 1,000,000,000 -> 3 commas
+1,000,000,000,000 -> 4 commas 1,000,000,000,000,000 -> 5 commas
+
+The problem can therefore be broken into progressively larger ranges.
+The result for the previous range can be reused recursively.
+
+Algorithm
+
+1.  If n < 1,000, return 0.
+2.  If n < 1,000,000, count all numbers from 1,000 through n.
+3.  For larger ranges, calculate the contribution of the newly
+    introduced comma and add the result for the previous range using
+    recursion.
+4.  Continue through 10^9, 10^12, and 10^15.
+5.  Return the accumulated result.
+
+Python Implementation
+
+class Solution: def countCommas(self, n: int) -> int: if n < 1000:
+return 0 elif n < 1000000: return (n - 103) + 1 elif n < 1000000000:
+return (((n - 106) * 2 + 106) + 2 + self.countCommas(106 - 1)) - 106
+elif n < 1012: return ((n - 109) * 3 + 109 + 3 + self.countCommas(109 -
+1)) - 109 elif n < 1015: return ((n - 1012) * 4 + 1012 + 4 +
+self.countCommas(1012 - 1)) - 1012 else: return
+self.countCommas(1015 - 1) + 5
+
+Why the Recursive Approach Works
+
+At each threshold, every number from that threshold through n gains one
+additional comma.
+
+For example, at 1,000,000, every number from 1,000,000 through n has a
+second comma. The recursive call handles the commas that already existed
+in the previous range.
+
+The same pattern repeats at 10^3, 10^6, 10^9, 10^12, and 10^15.
+
+Complexity of Approach 1
+
+Time Complexity: O(1)
+
+For this problem, n <= 10^15, so there are only five possible comma
+positions. The recursion has a constant maximum depth.
+
+O(5) is written as O(1).
+
+Auxiliary Space: O(1)
+
+The recursive calls use call-stack space, but the maximum recursion
+depth is bounded by a constant because n is limited to 10^15.
+
+For a generalized version without this fixed upper bound, the recursive
+depth would be O(log n).
+
+Approach 2 – Iterative Mathematical Approach
+
+Idea
+
+Instead of handling every range with separate formulas, count the
+contribution of each comma position independently.
+
+The first comma appears in every number >= 1,000.
+
+Contribution of the first comma:
+
+n - 1,000 + 1
+
+The second comma appears in every number >= 1,000,000.
+
+Contribution of the second comma:
+
+n - 1,000,000 + 1
+
+The same pattern continues for 10^9, 10^12, and 10^15.
+
+Algorithm
+
+1.  Initialize ans = 0.
+2.  Start power = 1,000.
+3.  While power <= n:
+    -   Add n - power + 1 to ans.
+    -   Multiply power by 1,000.
+4.  Return ans.
+
+Python Implementation
+
+class Solution: def countCommas(self, n: int) -> int: ans = 0 power =
+1000
+
+        while power <= n:
+            ans += n - power + 1
+            power *= 1000
+
+        return ans
+
+Example Walkthrough
+
+Suppose n = 1,000,002.
+
+First comma:
+
+Numbers from 1,000 through 1,000,002 contain the first comma.
+
+1,000,002 - 1,000 + 1 = 999,003
+
+Second comma:
+
+Numbers from 1,000,000 through 1,000,002 contain the second comma.
+
+1,000,002 - 1,000,000 + 1 = 3
+
+Total:
+
+999,003 + 3 = 999,006
+
+Correctness
+
+For every comma position represented by power = 10^(3k):
+
+-   Numbers below power do not contain that comma.
+-   Every number from power through n contains that comma.
+-   The number of integers in [power, n] is n - power + 1.
+
+Therefore, adding this contribution for every power of 1,000 gives
+exactly the total number of commas.
+
+Complexity of Approach 2
+
+Time Complexity: O(1) for the given constraint.
+
+The loop executes at most five times:
+
+10^3, 10^6, 10^9, 10^12, 10^15.
+
+Auxiliary Space: O(1).
+
+Only a constant number of integer variables are used.
+
+Comparison
+
+Approach 1 – Recursive
+
+Time: O(1) for the given constraint Space: O(1) for the given constraint
+Main idea: Reuse the solution for the previous comma range recursively.
+Advantage: Demonstrates recursive problem decomposition. Disadvantage:
+The formulas are more complicated and harder to verify.
+
+Approach 2 – Iterative Mathematical
+
+Time: O(1) for the given constraint Space: O(1) Main idea: Count the
+contribution of each comma position independently. Advantage: Shorter,
+cleaner, and easier to verify. Disadvantage: Requires recognizing the
+mathematical pattern.
+
+Optimality
+
+Both approaches are asymptotically optimal for the given constraints.
+
+Time Complexity: O(1) Auxiliary Space: O(1)
+
+No standard asymptotically better complexity than O(1) exists.
+
+The iterative mathematical approach is preferable for production-quality
+code because it expresses the underlying mathematical pattern more
+directly. The recursive approach is still a valid and useful solution
+because it demonstrates recognition of the repeated structure of the
+problem.
+
+Key Learning
+
+The important observation is that commas begin appearing at powers of
+1,000:
+
+10^3, 10^6, 10^9, 10^12, 10^15.
+
+For each threshold power:
+
+contribution = n - power + 1
+
+when power <= n.
+
+This transforms the problem from formatting individual numbers into a
+mathematical counting problem.
+
+Final Takeaway
+
+My recursive solution is correct and optimal for the given constraints.
+The recursion works because the same comma-counting structure repeats at
+every power of 1,000.
+
+The cleaner alternative is to iterate through those thresholds and count
+the contribution of each comma position independently.
+
+For n <= 10^15, both approaches achieve:
+
+Time: O(1) Auxiliary Space: O(1)
