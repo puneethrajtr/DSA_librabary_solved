@@ -1,0 +1,640 @@
+LeetCode 3483 – Unique 3-Digit Even Numbers
+
+Problem:
+Given an array of digits, return the number of unique 3-digit even numbers that can be formed using the given digits.
+
+Rules:
+
+1. The number must contain exactly 3 digits.
+2. The hundreds digit cannot be 0.
+3. The units digit must be even: 0, 2, 4, 6, or 8.
+4. Each digit can be used at most as many times as it appears in the input array.
+5. Different arrangements of the same digits are considered different numbers.
+6. The final answer should count unique numbers.
+
+Example:
+
+Input:
+digits = [1, 2, 2, 4]
+
+Possible valid numbers include:
+122, 124, 142, 212, 214, 224, 242, 412, 422, 424, etc.
+
+The same number must not be counted more than once.
+
+---
+
+## Approach 1: Brute Force Using Three Nested Loops
+
+Data Structure:
+Set
+
+Pattern:
+Brute Force / Enumeration
+
+Idea:
+
+A 3-digit number has three positions:
+
+hundreds → tens → units
+
+Therefore, we can try every possible combination of three different indices from the input array.
+
+For every combination:
+
+1. Select the hundreds digit.
+2. Select the tens digit.
+3. Select the units digit.
+4. Make sure the three indices are different.
+5. Check whether the resulting number is even.
+6. Store the number in a set so duplicate numbers are counted only once.
+
+Original Approach:
+
+class Solution:
+def totalNumbers(self, digits: List[int]) -> int:
+distinct = set()
+
+```
+    for i in range(len(digits)):
+        if digits[i] != 0:
+            number = digits[i] * 100
+
+            for j in range(len(digits)):
+                if i == j:
+                    continue
+                else:
+                    number += digits[j] * 10
+
+                    for k in range(len(digits)):
+                        if i == k or j == k:
+                            continue
+                        else:
+                            number += digits[k]
+
+                            if number not in distinct and number % 2 == 0:
+                                distinct.add(number)
+
+                            number -= digits[k]
+
+                    number -= digits[j] * 10
+
+    return len(distinct)
+```
+
+How This Works:
+
+Suppose:
+
+digits = [1, 2, 2, 4]
+
+The loops select three different indices.
+
+For example:
+
+i → digit 2
+j → digit 2
+k → digit 4
+
+This produces:
+
+224
+
+Because the input contains two copies of digit 2, 224 is valid.
+
+The set is required because the same numerical value can sometimes be generated through different index combinations.
+
+For example, if the input contains duplicate digits, two different index combinations may produce the same number.
+
+The set removes those duplicates.
+
+Complexity:
+
+Time Complexity:
+O(n³)
+
+There are three nested loops, and each loop can traverse the input.
+
+Space Complexity:
+O(1) for the set under the constraints of this particular problem.
+
+The input contains only digits 0–9 and its length is at most 10. Therefore, the number of possible unique 3-digit even numbers is bounded by a constant.
+
+However, conceptually, the set is an additional data structure that stores generated numbers.
+
+Limitations:
+
+1. It repeatedly works with input indices.
+2. It needs a set to remove duplicate numbers.
+3. It performs up to O(n³) combinations.
+4. The algorithm does not directly use the fact that the input values are restricted to digits 0–9.
+
+---
+
+## Approach 2: Frequency Counting + Backtracking
+
+Data Structure:
+Frequency Array
+
+Pattern:
+Frequency Counting + Backtracking / Enumeration
+
+Core Idea:
+
+Instead of asking:
+
+"Which index contains the digit I want?"
+
+we ask:
+
+"How many copies of this digit are available?"
+
+Since the only possible digits are 0 through 9, we can create a frequency array of size 10.
+
+count[digit] represents how many copies of that digit are currently available.
+
+Example:
+
+digits = [1, 3, 3, 5, 8]
+
+Frequency table:
+
+Digit:      0 1 2 3 4 5 6 7 8 9
+Frequency:  0 1 0 2 0 1 0 0 1 0
+
+Therefore:
+
+count[3] = 2
+
+means two copies of digit 3 are available.
+
+Why Frequency Counting Works:
+
+Suppose we want to create:
+
+338
+
+We need:
+
+one 3 for the hundreds position,
+one 3 for the tens position,
+one 8 for the units position.
+
+Initially:
+
+count[3] = 2
+count[8] = 1
+
+After selecting the first 3:
+
+count[3] -= 1
+
+Now:
+
+count[3] = 1
+
+This tells us that another 3 is still available.
+
+After selecting the second 3:
+
+count[3] -= 1
+
+Now:
+
+count[3] = 0
+
+There are no more copies of 3 available.
+
+We do not need to traverse the original digits array again.
+
+The frequency array acts like an inventory of available digits.
+
+---
+
+## How the Three Positions Are Selected
+
+A 3-digit number has:
+
+Hundreds position
+Tens position
+Units position
+
+We still use nested loops, but instead of iterating over input indices, we iterate over possible digit values.
+
+Hundreds:
+
+for h in range(1, 10):
+
+The hundreds digit can be 1 through 9 because it cannot be 0.
+
+Tens:
+
+for t in range(10):
+
+The tens digit can be any digit from 0 through 9.
+
+Units:
+
+for u in range(0, 10, 2):
+
+The units digit must be even, so the possibilities are:
+
+0, 2, 4, 6, 8
+
+Therefore:
+
+for h in range(1, 10):
+for t in range(10):
+for u in range(0, 10, 2):
+
+These loops generate the possible digit choices for the three positions.
+
+The frequency array determines whether those choices can actually be formed using the available digits.
+
+---
+
+## Backtracking Concept
+
+When a digit is selected, temporarily decrease its frequency.
+
+Example:
+
+count[3] = 2
+
+Select digit 3:
+
+count[3] -= 1
+
+Now:
+
+count[3] = 1
+
+After finishing the current branch of exploration, restore the digit:
+
+count[3] += 1
+
+This restoration is necessary because the same digit may be needed when exploring another possible number.
+
+The process is:
+
+Choose
+↓
+Decrease frequency
+↓
+Explore
+↓
+Restore frequency
+
+This is the basic backtracking pattern.
+
+---
+
+## Final Frequency-Based Solution
+
+class Solution:
+def totalNumbers(self, digits: List[int]) -> int:
+evenNumberCount = 0
+count = [0] * 10
+
+```
+    for digit in digits:
+        count[digit] += 1
+
+    for h in range(1, 10):
+        if count[h] > 0:
+            count[h] -= 1
+
+            for t in range(10):
+                if count[t] > 0:
+                    count[t] -= 1
+
+                    for u in range(0, 10, 2):
+                        if count[u] > 0:
+                            evenNumberCount += 1
+
+                    count[t] += 1
+
+            count[h] += 1
+
+    return evenNumberCount
+```
+
+---
+
+## Step-by-Step Explanation of the Final Solution
+
+Step 1: Build the frequency array
+
+count = [0] * 10
+
+for digit in digits:
+count[digit] += 1
+
+This requires one traversal of the input.
+
+For:
+
+digits = [1, 2, 2, 4]
+
+the frequency array becomes:
+
+count[1] = 1
+count[2] = 2
+count[4] = 1
+
+Step 2: Select the hundreds digit
+
+for h in range(1, 10):
+
+We only consider 1–9 because a 3-digit number cannot start with zero.
+
+Before exploring a particular hundreds digit, check:
+
+if count[h] > 0:
+
+If it exists, temporarily consume it:
+
+count[h] -= 1
+
+Step 3: Select the tens digit
+
+for t in range(10):
+
+The tens digit can be any digit from 0–9.
+
+Check:
+
+if count[t] > 0:
+
+If available, temporarily consume it:
+
+count[t] -= 1
+
+Step 4: Select the units digit
+
+for u in range(0, 10, 2):
+
+Only even digits are considered.
+
+These are:
+
+0, 2, 4, 6, 8
+
+If:
+
+count[u] > 0
+
+then the selected hundreds, tens, and units digits can form a valid 3-digit even number.
+
+Therefore:
+
+evenNumberCount += 1
+
+Step 5: Restore the tens digit
+
+After checking all possible units digits:
+
+count[t] += 1
+
+This makes the tens digit available again for the next branch.
+
+Step 6: Restore the hundreds digit
+
+After checking all possible tens and units choices:
+
+count[h] += 1
+
+This restores the original frequency before trying another hundreds digit.
+
+---
+
+## Why No Set Is Required
+
+The brute-force solution needs a set because it works with input indices.
+
+For example, duplicate digits can produce the same number through different index combinations.
+
+The frequency approach works differently.
+
+For every digit value h, t, and u, we examine the digit combination itself.
+
+A combination such as:
+
+h = 2
+t = 2
+u = 4
+
+is considered once.
+
+We are counting valid digit combinations rather than generating the same numerical value from multiple physical indices.
+
+Therefore, a set is unnecessary.
+
+This reduces the extra storage required by the algorithm.
+
+---
+
+## Why This Pattern Works
+
+This problem is a good example of Frequency Counting because:
+
+1. The input values come from a very small fixed domain: 0–9.
+2. We care about how many copies of each digit are available.
+3. We need to use digits without exceeding their available frequencies.
+4. We need to construct a fixed-size object: a 3-digit number.
+5. The final digit has a specific restriction: it must be even.
+
+Frequency counting converts the question:
+
+"Can I find another unused copy of this digit?"
+
+into:
+
+"Is count[digit] greater than zero?"
+
+This avoids searching the original array repeatedly.
+
+---
+
+## Backtracking Interpretation
+
+The frequency array can be viewed as an inventory.
+
+For example:
+
+digits = [2, 2, 4]
+
+Inventory:
+
+2 → 2 copies
+4 → 1 copy
+
+If we select 2:
+
+2 → 1 copy remaining
+
+If we select another 2:
+
+2 → 0 copies remaining
+
+Therefore, another 2 cannot be selected in that branch.
+
+After finishing that branch, restore the frequency.
+
+This is why the algorithm can correctly handle duplicate digits without a set.
+
+---
+
+## Complexity Analysis
+
+Building the frequency array:
+
+O(n)
+
+The remaining loops have fixed ranges:
+
+Hundreds:
+9 possibilities
+
+Tens:
+10 possibilities
+
+Units:
+5 possibilities
+
+Maximum combinations:
+
+9 × 10 × 5 = 450
+
+Therefore:
+
+Time = O(n + 450)
+
+Since the problem constraints are:
+
+n <= 10
+
+and the digit domain is fixed at 0–9:
+
+Time Complexity = O(1)
+
+Auxiliary Space:
+
+count = [0] * 10
+
+The frequency array always contains exactly 10 elements.
+
+Therefore:
+
+Space Complexity = O(10) = O(1)
+
+No set or list of generated numbers is required.
+
+---
+
+## Comparison of Both Approaches
+
+Brute Force:
+
+Pattern:
+Three nested loops over input indices
+
+Data Structure:
+Set
+
+Time:
+O(n³)
+
+Space:
+Additional storage for the set; bounded by the fixed number of possible 3-digit even numbers under the problem constraints.
+
+Advantages:
+
+* Straightforward to discover.
+* Directly follows the idea of choosing three different indices.
+* Easy to understand initially.
+
+Disadvantages:
+
+* Repeatedly works with indices.
+* Requires a set to eliminate duplicate numbers.
+* Does not fully exploit the fact that digits are only 0–9.
+
+Frequency + Backtracking:
+
+Pattern:
+Frequency Counting + Backtracking
+
+Data Structure:
+Frequency array of size 10
+
+Time:
+O(n + 450) = O(1) under the given constraints
+
+Space:
+O(1)
+
+Advantages:
+
+* No set required.
+* Handles duplicate digits naturally.
+* Uses the fixed digit domain efficiently.
+* Directly checks digit availability.
+* Asymptotically optimal for this problem.
+
+---
+
+## Key DSA Lessons
+
+1. Nested loops do not automatically mean high space complexity.
+
+Three nested loops can still use O(1) space if they do not store a growing amount of data.
+
+2. Frequency arrays are useful when the value range is small.
+
+Because the only possible values are 0–9, an array of size 10 is ideal.
+
+3. Frequency counting can replace repeated searching.
+
+Instead of repeatedly searching the input for another copy of a digit, maintain its count.
+
+4. Backtracking means choose → explore → restore.
+
+Temporarily decreasing and later increasing the frequency is the restoration step.
+
+5. A fixed number of operations is O(1).
+
+Although the algorithm checks up to 450 combinations:
+
+O(450) = O(1)
+
+because 450 is a constant.
+
+6. Optimize the right thing.
+
+The goal is not necessarily to eliminate nested loops.
+
+The important question is whether the loops depend on the input size or on a fixed small domain.
+
+---
+
+## Final Takeaway
+
+The main conceptual shift from the brute-force solution to the optimized solution is:
+
+Brute Force:
+
+"Which input indices can I choose?"
+
+Frequency Counting:
+
+"Which digit values can I choose, and how many copies are available?"
+
+The frequency array acts as an inventory of digits, while the nested loops enumerate the possible hundreds, tens, and units positions.
+
+The final solution achieves:
+
+Time Complexity: O(1) under the problem constraints
+Auxiliary Space: O(1)
+
+This is the optimal asymptotic complexity for LeetCode 3483.
