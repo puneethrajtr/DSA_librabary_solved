@@ -1,0 +1,768 @@
+LeetCode 7 – Reverse Integer
+
+Problem:
+Given a signed 32-bit integer x, return x with its digits reversed.
+
+If reversing x causes the result to go outside the signed 32-bit integer range:
+
+[-2^31, 2^31 - 1]
+
+return 0.
+
+The environment may not allow the use of 64-bit integers, so the solution should detect overflow before it occurs.
+
+Signed 32-bit integer range:
+
+Minimum = -2^31 = -2147483648
+Maximum = 2^31 - 1 = 2147483647
+
+Examples:
+
+Input:
+123
+
+Output:
+321
+
+Input:
+-123
+
+Output:
+-321
+
+Input:
+120
+
+Output:
+21
+
+Input:
+1534236469
+
+Output:
+0
+
+Reason:
+The reversed number exceeds the signed 32-bit integer range.
+
+---
+
+## Data Structure
+
+No special data structure is required.
+
+The algorithm only uses a few integer variables:
+
+* reverse
+* digit
+* x
+* sign (in the Python implementation)
+
+Therefore:
+
+Auxiliary Space = O(1)
+
+---
+
+## Pattern
+
+Pattern:
+
+Mathematical Digit Manipulation / Number Reversal
+
+The main operations are:
+
+1. Extract the last digit using modulo 10.
+2. Remove the last digit using integer division by 10.
+3. Add the extracted digit to the reversed number.
+4. Check for integer overflow before constructing the next reversed value.
+
+---
+
+## Core Idea
+
+The fundamental operation for reversing an integer is:
+
+digit = x % 10
+
+This extracts the last digit of x.
+
+For example:
+
+x = 123
+
+123 % 10 = 3
+
+Then remove the last digit:
+
+x = x // 10
+
+123 // 10 = 12
+
+Now append the extracted digit to the reversed number:
+
+reverse = reverse * 10 + digit
+
+Initially:
+
+reverse = 0
+
+After extracting 3:
+
+reverse = 0 * 10 + 3
+reverse = 3
+
+Then extract 2:
+
+reverse = 3 * 10 + 2
+reverse = 32
+
+Then extract 1:
+
+reverse = 32 * 10 + 1
+reverse = 321
+
+---
+
+## Step-by-Step Algorithm
+
+1. Initialize reverse = 0.
+
+2. Check whether x is negative.
+
+3. If x is negative:
+
+   * Convert x to its positive value.
+   * Store the sign separately.
+
+4. Repeatedly extract the last digit:
+
+   digit = x % 10
+
+5. Remove the last digit:
+
+   x = x // 10
+
+6. Add the digit to reverse:
+
+   reverse = reverse * 10 + digit
+
+7. Continue until all digits have been processed.
+
+8. Check whether the reversed number is inside the signed 32-bit range.
+
+9. If it is inside the range, return the reversed number with its original sign.
+
+10. Otherwise, return 0.
+
+---
+
+## My Python Approach
+
+class Solution:
+def reverse(self, x: int) -> int:
+negative = 1
+reverse = 0
+
+```
+    if x < 0:
+        x = x * -1
+        negative = -1
+
+    while x > 0:
+        reverse = reverse * 10 + x % 10
+        x = x // 10
+
+    if -2**31 <= reverse <= 2**31 - 1:
+        return reverse * negative
+    else:
+        return 0
+```
+
+---
+
+## Explanation of My Python Solution
+
+The variable:
+
+negative = 1
+
+is used to remember whether the original number was positive or negative.
+
+If:
+
+x < 0
+
+then:
+
+x = x * -1
+negative = -1
+
+This allows the digit-reversal logic to work with a positive value.
+
+For example:
+
+x = -123
+
+After handling the sign:
+
+x = 123
+negative = -1
+
+The algorithm reverses 123 into 321.
+
+Finally:
+
+321 * -1 = -321
+
+---
+
+## Why x % 10 Is Used
+
+The modulo operator gives the remainder after division by 10.
+
+Therefore, it extracts the last digit.
+
+Examples:
+
+123 % 10 = 3
+456 % 10 = 6
+789 % 10 = 9
+
+This is exactly the digit needed to construct the reversed number.
+
+---
+
+## Why x // 10 Is Used
+
+Integer division by 10 removes the last digit.
+
+Examples:
+
+123 // 10 = 12
+12 // 10 = 1
+1 // 10 = 0
+
+Therefore, the combination:
+
+digit = x % 10
+x = x // 10
+
+allows us to process one digit at a time.
+
+---
+
+## How the Reversed Number Is Constructed
+
+The reversed number is constructed using:
+
+reverse = reverse * 10 + digit
+
+Suppose:
+
+x = 123
+
+Initially:
+
+reverse = 0
+
+First digit:
+
+digit = 3
+
+reverse = 0 * 10 + 3
+reverse = 3
+
+Second digit:
+
+digit = 2
+
+reverse = 3 * 10 + 2
+reverse = 32
+
+Third digit:
+
+digit = 1
+
+reverse = 32 * 10 + 1
+reverse = 321
+
+---
+
+## Important: Overflow Detection
+
+Overflow detection is the most important part of this problem.
+
+The problem specifically says:
+
+Assume the environment does not allow you to store 64-bit integers.
+
+Therefore, we cannot simply construct a potentially huge reversed integer and check it afterward.
+
+For example, suppose:
+
+reverse = 214748364
+
+digit = 8
+
+The next operation would be:
+
+reverse * 10 + digit
+
+= 2147483648
+
+But the maximum signed 32-bit integer is:
+
+2147483647
+
+Therefore, the operation would overflow.
+
+The correct algorithm must detect this BEFORE performing:
+
+reverse * 10 + digit
+
+---
+
+## Python vs Other Languages
+
+Python integers have arbitrary precision.
+
+This means Python integers are not restricted to 32-bit or 64-bit ranges in the same way as Java's int.
+
+Therefore, Python can temporarily hold a value larger than:
+
+2147483647
+
+For example:
+
+2147483648
+
+is perfectly representable as a Python integer.
+
+That is why the following Python code works:
+
+if -2**31 <= reverse <= 2**31 - 1:
+return reverse
+else:
+return 0
+
+Python can construct the value first and check it afterward.
+
+However, this does not follow the strict spirit of the problem's restriction about not being able to store a 64-bit integer.
+
+In languages using fixed-width integer types, such as Java's int, the multiplication:
+
+reverse * 10
+
+can overflow before we get an opportunity to check the result.
+
+Therefore, the safer general algorithm is:
+
+CHECK → THEN CALCULATE
+
+---
+
+## Overflow-Safe Algorithm
+
+Before performing:
+
+reverse = reverse * 10 + digit
+
+check whether the operation would exceed the 32-bit limits.
+
+For positive overflow:
+
+reverse > (MAX_VALUE - digit) / 10
+
+means the next operation would exceed the maximum value.
+
+For negative overflow:
+
+reverse < (MIN_VALUE - digit) / 10
+
+means the next operation would go below the minimum value.
+
+Therefore:
+
+if reverse > (MAX_VALUE - digit) / 10:
+return 0
+
+if reverse < (MIN_VALUE - digit) / 10:
+return 0
+
+Only after these checks do we perform:
+
+reverse = reverse * 10 + digit
+
+---
+
+## Why the Overflow Formula Works
+
+We want:
+
+reverse * 10 + digit
+
+to remain within:
+
+[-2147483648, 2147483647]
+
+For the upper limit:
+
+reverse * 10 + digit <= 2147483647
+
+Rearranging:
+
+reverse <= (2147483647 - digit) / 10
+
+Therefore, if:
+
+reverse > (2147483647 - digit) / 10
+
+the next operation would overflow.
+
+The same logic applies to the minimum value:
+
+reverse * 10 + digit >= -2147483648
+
+Therefore:
+
+reverse >= (-2147483648 - digit) / 10
+
+If this condition is violated, the next operation would underflow.
+
+---
+
+## Java Solution – Overflow Safe
+
+class Solution {
+public int reverse(int x) {
+
+```
+    int reverse = 0;
+
+    while (x != 0) {
+
+        int digit = x % 10;
+        x /= 10;
+
+        if (reverse > Integer.MAX_VALUE / 10 ||
+            (reverse == Integer.MAX_VALUE / 10 && digit > 7)) {
+            return 0;
+        }
+
+        if (reverse < Integer.MIN_VALUE / 10 ||
+            (reverse == Integer.MIN_VALUE / 10 && digit < -8)) {
+            return 0;
+        }
+
+        reverse = reverse * 10 + digit;
+    }
+
+    return reverse;
+}
+```
+
+}
+
+---
+
+## How the Java Solution Handles Negative Numbers
+
+An important difference from the Python implementation is that the Java solution does not need to convert x to a positive number.
+
+For:
+
+x = -123
+
+Java calculates:
+
+-123 % 10 = -3
+
+Then:
+
+-123 / 10 = -12
+
+Next:
+
+-12 % 10 = -2
+
+Then:
+
+-12 / 10 = -1
+
+Finally:
+
+-1 % 10 = -1
+
+Therefore, the algorithm directly constructs:
+
+-321
+
+This also avoids a potential problem with converting the minimum integer:
+
+-2147483648
+
+to positive.
+
+The positive value:
+
+2147483648
+
+cannot be represented by Java's signed 32-bit int.
+
+Therefore, keeping the number negative/using the original sign directly is a safer general technique.
+
+---
+
+## Why Integer.MAX_VALUE Uses 7
+
+The maximum signed 32-bit integer is:
+
+2147483647
+
+Before adding the final digit, the maximum prefix is:
+
+214748364
+
+If:
+
+reverse == 214748364
+
+the final digit can be at most 7.
+
+Therefore:
+
+if (reverse == Integer.MAX_VALUE / 10 && digit > 7)
+
+then the result would overflow.
+
+---
+
+## Why Integer.MIN_VALUE Uses -8
+
+The minimum signed 32-bit integer is:
+
+-2147483648
+
+Before adding the final digit, the prefix is:
+
+-214748364
+
+The final digit can be as small as -8.
+
+Therefore:
+
+if (reverse == Integer.MIN_VALUE / 10 && digit < -8)
+
+then the result would go below the minimum 32-bit value.
+
+This is also why the positive and negative boundaries are slightly different:
+
+Maximum = 2147483647
+Minimum = -2147483648
+
+---
+
+## Correctness Explanation
+
+The algorithm processes every digit of x exactly once.
+
+For each iteration:
+
+1. x % 10 extracts the last remaining digit.
+2. x / 10 removes that digit.
+3. reverse * 10 shifts the already constructed digits one position to the left.
+4. Adding the extracted digit places it in the correct position.
+
+Therefore, after processing all digits, reverse contains the digits of x in reverse order.
+
+The overflow check is performed before constructing the next value, ensuring that the result always remains within the signed 32-bit range.
+
+If the next operation would exceed the range, the algorithm immediately returns 0.
+
+Therefore, the algorithm correctly handles both valid reversed integers and overflow cases.
+
+---
+
+## Example Walkthrough
+
+Input:
+
+x = 123
+
+Initially:
+
+reverse = 0
+
+Iteration 1:
+
+digit = 123 % 10
+digit = 3
+
+x = 123 / 10
+x = 12
+
+reverse = 0 * 10 + 3
+reverse = 3
+
+Iteration 2:
+
+digit = 12 % 10
+digit = 2
+
+x = 12 / 10
+x = 1
+
+reverse = 3 * 10 + 2
+reverse = 32
+
+Iteration 3:
+
+digit = 1 % 10
+digit = 1
+
+x = 1 / 10
+x = 0
+
+reverse = 32 * 10 + 1
+reverse = 321
+
+Output:
+
+321
+
+---
+
+## Example With Trailing Zero
+
+Input:
+
+x = 120
+
+The digits are processed:
+
+0
+2
+1
+
+Construction:
+
+reverse = 0
+
+After 0:
+
+reverse = 0
+
+After 2:
+
+reverse = 2
+
+After 1:
+
+reverse = 21
+
+Output:
+
+21
+
+The leading zero created during reversal is naturally discarded because integers do not preserve leading zeros.
+
+---
+
+## Complexity Analysis
+
+Let d be the number of digits in x.
+
+Each digit is processed exactly once.
+
+Time Complexity:
+
+O(d)
+
+Since:
+
+d = O(log |x|)
+
+we can also express the complexity as:
+
+O(log |x|)
+
+Because x is restricted to a signed 32-bit integer, it contains at most 10 digits. Therefore, under the fixed problem constraints, the number of iterations is bounded by a constant.
+
+Auxiliary Space:
+
+O(1)
+
+Only a constant number of variables are used.
+
+No array, list, set, string, or other growing data structure is required.
+
+---
+
+## Key DSA Lessons
+
+1. Modulo 10 extracts the last digit.
+
+x % 10
+
+2. Integer division by 10 removes the last digit.
+
+x // 10 in Python
+x / 10 in Java integer arithmetic
+
+3. reverse * 10 shifts the existing digits left.
+
+4. The main challenge is not reversing the digits.
+
+The main challenge is detecting integer overflow correctly.
+
+5. In Python, integers have arbitrary precision, so Python can temporarily represent values outside the 32-bit range.
+
+6. In languages with fixed-width integers such as Java, overflow can occur during the calculation itself.
+
+7. Therefore, the language-independent principle is:
+
+Check for overflow before performing the potentially overflowing operation.
+
+8. Negative numbers should be handled carefully because the signed 32-bit range is asymmetric:
+
+-2147483648 to 2147483647
+
+---
+
+## Final Takeaway
+
+The core algorithm for Reverse Integer is simple:
+
+Extract last digit
+↓
+Remove last digit
+↓
+Append digit to reverse
+↓
+Repeat
+
+The real interview/OA concept is:
+
+OVERFLOW DETECTION
+
+The operation:
+
+reverse = reverse * 10 + digit
+
+must not be performed blindly when working with fixed-width integers.
+
+The robust approach is:
+
+Check whether the next operation will overflow
+↓
+If overflow → return 0
+↓
+Otherwise → construct the next reversed value
+
+Final Complexity:
+
+Time: O(log |x|), or O(1) under the fixed 32-bit constraint
+Auxiliary Space: O(1)
+
+This makes digit extraction + overflow detection the central pattern for this problem.
