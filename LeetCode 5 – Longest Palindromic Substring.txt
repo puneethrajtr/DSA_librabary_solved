@@ -1,0 +1,653 @@
+LeetCode 5 – Longest Palindromic Substring
+
+Problem
+
+Given a string s, return the longest palindromic substring in s.
+
+A palindrome is a string that reads the same forward and backward.
+
+Examples:
+
+Input: "babad"
+Output: "bab"
+"aba" is also a valid answer.
+
+Input: "cbbd"
+Output: "bb"
+
+Input: "adbbdc"
+Output: "dbbd"
+
+Constraint:
+
+1 <= s.length <= 1000
+
+Approach 1 – Brute Force
+
+Idea
+
+The brute-force approach is to generate every possible substring and check whether that substring is a palindrome.
+
+For every starting index l, consider every possible ending index r.
+
+For each substring:
+
+```
+s[l:r+1]
+```
+
+check whether:
+
+```
+substring == substring[::-1]
+```
+
+If it is a palindrome and its length is greater than the current longest palindrome, update the answer.
+
+Code
+
+```
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        long_palindrome = ''
+
+        if s == s[::-1]:
+            return s
+
+        for l in range(len(s)):
+            r = l
+
+            while r < len(s):
+                sub_string = s[l:r+1]
+
+                if sub_string == sub_string[::-1] and r-l >= len(long_palindrome):
+                    long_palindrome = s[l:r+1]
+
+                r += 1
+
+        return long_palindrome
+```
+
+How the Brute-Force Approach Works
+
+Suppose:
+
+```
+s = "babad"
+```
+
+The algorithm considers substrings such as:
+
+```
+"b"
+"ba"
+"bab"
+"baba"
+"babad"
+"a"
+"ab"
+"aba"
+"abad"
+...
+```
+
+For each substring, it creates the reversed version and compares them.
+
+For example:
+
+```
+"bab" == "bab"[::-1]
+```
+
+Therefore "bab" is a palindrome.
+
+The algorithm keeps the longest palindrome found.
+
+Time Complexity
+
+There are O(n²) possible substrings.
+
+Checking whether a substring is a palindrome using:
+
+```
+substring == substring[::-1]
+```
+
+can take O(n) time because the substring may contain O(n) characters.
+
+Therefore:
+
+```
+O(n²) substrings × O(n) palindrome checking
+= O(n³)
+```
+
+Time Complexity: O(n³)
+
+Space Complexity
+
+The temporary substring and reversed substring can require O(n) space.
+
+Therefore:
+
+```
+Space Complexity: O(n)
+```
+
+This is auxiliary space; the returned result is not normally counted as working memory.
+
+Advantages
+
+* Very straightforward to understand.
+* Easy to implement.
+* Good starting point for understanding the problem.
+* Useful for deriving a better solution.
+
+Disadvantages
+
+* Generates many unnecessary substrings.
+* Repeatedly creates reversed strings.
+* O(n³) worst-case time.
+* Much slower than the Expand Around Center approach.
+
+Approach 2 – Expand Around Center
+
+This is the optimized approach developed from the brute-force solution.
+
+Core Idea
+
+Every palindrome has a center.
+
+A palindrome can have either:
+
+1. An odd number of characters.
+2. An even number of characters.
+
+Odd-length palindrome:
+
+```
+"aba"
+```
+
+The center is a character:
+
+```
+a b a
+  ↑
+center
+```
+
+Therefore:
+
+```
+left = center
+right = center
+```
+
+Even-length palindrome:
+
+```
+"bb"
+```
+
+There is no single middle character.
+
+The center is the gap between two characters:
+
+```
+b | b
+  ↑
+center
+```
+
+Therefore:
+
+```
+left = center
+right = center + 1
+```
+
+Why We Need Both Centers
+
+Consider:
+
+```
+"adbbdc"
+```
+
+The longest palindrome is:
+
+```
+"dbbd"
+```
+
+Its center is:
+
+```
+a d b | b d c
+    ↑
+   gap
+```
+
+Starting from the gap between the two b's:
+
+```
+left = 2
+right = 3
+```
+
+Compare:
+
+```
+s[2] == s[3]
+
+b == b
+```
+
+They match, so expand.
+
+Next:
+
+```
+left = 1
+right = 4
+```
+
+Compare:
+
+```
+s[1] == s[4]
+
+d == d
+```
+
+They match again.
+
+Next:
+
+```
+left = 0
+right = 5
+```
+
+Compare:
+
+```
+s[0] == s[5]
+
+a != c
+```
+
+Stop.
+
+Therefore:
+
+```
+"dbbd"
+```
+
+is a palindrome.
+
+Two-Pointer Technique
+
+The second approach does not require a special data structure such as a stack, queue, hash table, or DP table.
+
+It uses two pointers:
+
+```
+l
+r
+```
+
+to expand outward from a possible palindrome center.
+
+For every position:
+
+Odd-length expansion:
+
+```
+l = center
+r = center
+```
+
+Even-length expansion:
+
+```
+l = center
+r = center + 1
+```
+
+Then:
+
+```
+while l >= 0 and r < len(s) and s[l] == s[r]:
+
+    l -= 1
+    r += 1
+```
+
+The pointers continue moving outward while the characters match.
+
+Code
+
+```
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        best_start = 0
+        best_end = 0
+
+        for center in range(len(s)):
+
+            # Even-length palindrome
+            l = center
+            r = center + 1
+
+            while l >= 0 and r < len(s) and s[l] == s[r]:
+                l -= 1
+                r += 1
+
+            if r - (l + 1) > best_end - best_start:
+                best_start = l + 1
+                best_end = r
+
+            # Odd-length palindrome
+            l = center
+            r = center
+
+            while l >= 0 and r < len(s) and s[l] == s[r]:
+                l -= 1
+                r += 1
+
+            if r - (l + 1) > best_end - best_start:
+                best_start = l + 1
+                best_end = r
+
+        return s[best_start:best_end]
+```
+
+Why best_start and best_end Are Used
+
+Instead of creating a new substring every time a palindrome is found, the algorithm only stores its boundaries.
+
+For example:
+
+```
+s = "adbbdc"
+```
+
+When "dbbd" is found:
+
+```
+best_start = 1
+best_end = 5
+```
+
+The actual substring is created only once, at the end:
+
+```
+s[best_start:best_end]
+```
+
+This avoids repeatedly creating substrings during the search.
+
+Why the Second Approach Is Better
+
+The brute-force approach asks:
+
+```
+"Is this particular substring a palindrome?"
+```
+
+It generates a large number of substrings and checks each one.
+
+The Expand Around Center approach asks:
+
+```
+"What is the largest palindrome centered here?"
+```
+
+This avoids generating every possible substring.
+
+Instead of:
+
+```
+Generate substring
+        ↓
+Create reverse
+        ↓
+Compare
+        ↓
+Repeat
+```
+
+we do:
+
+```
+Choose center
+      ↓
+Expand left and right
+      ↓
+Stop when characters differ
+      ↓
+Remember the best indices
+```
+
+Therefore, the time complexity improves from:
+
+```
+O(n³)
+```
+
+to:
+
+```
+O(n²)
+```
+
+Time Complexity
+
+There are n possible character centers.
+
+For each center, we perform:
+
+1. One odd-length expansion.
+2. One even-length expansion.
+
+Each expansion can take O(n) in the worst case.
+
+Therefore:
+
+```
+O(n × n)
+= O(n²)
+```
+
+Time Complexity: O(n²)
+
+Space Complexity
+
+Only a constant number of variables are used:
+
+```
+best_start
+best_end
+center
+l
+r
+```
+
+No DP table, stack, set, or collection proportional to n is required.
+
+Therefore:
+
+```
+Auxiliary Space: O(1)
+```
+
+The final returned substring requires memory for the result, but it is normally not counted as auxiliary working space.
+
+Advantages
+
+* Reduces time from O(n³) to O(n²).
+* Uses O(1) auxiliary space.
+* Handles both odd and even-length palindromes.
+* Does not require a DP table.
+* Simple enough to derive and explain in an interview.
+* Much more efficient than checking every substring.
+* Works very well for the given constraint n <= 1000.
+
+Disadvantages
+
+* Still requires O(n²) time.
+* Each center may require a long expansion.
+* There is a theoretically faster O(n) algorithm.
+
+Approach 3 – Manacher's Algorithm
+
+Manacher's Algorithm is the most time-efficient standard approach for finding the longest palindromic substring.
+
+Core Idea
+
+Manacher's Algorithm processes the string in linear time by reusing information about palindromes that have already been calculated.
+
+Instead of independently expanding around every center, it maintains information about previously discovered palindromes.
+
+It transforms the string so that odd- and even-length palindromes can be handled in a unified way.
+
+For example:
+
+```
+"abba"
+```
+
+can conceptually be transformed by inserting separators between characters so that the even-length palindrome also has a single center.
+
+Manacher's Algorithm then calculates the palindrome radius around every center while using previously calculated information to avoid repeating unnecessary comparisons.
+
+The algorithm maintains concepts such as:
+
+```
+palindrome radius
+current right boundary
+current center
+```
+
+The previously calculated palindrome information can often be mirrored around the current center, allowing the algorithm to skip comparisons that are already known.
+
+This is what allows Manacher's Algorithm to achieve linear time.
+
+Time Complexity
+
+Manacher's Algorithm processes the string in:
+
+```
+O(n)
+```
+
+time.
+
+Time Complexity: O(n)
+
+Space Complexity
+
+The algorithm maintains an array containing the palindrome radius/information for each position.
+
+Therefore:
+
+```
+Space Complexity: O(n)
+```
+
+Comparison of All Three Approaches
+
+```
+Approach                  Time       Auxiliary Space
+
+Brute Force               O(n³)      O(n)
+
+Expand Around Center      O(n²)      O(1)
+
+Manacher's Algorithm      O(n)       O(n)
+```
+
+Which Approach Should Be Preferred?
+
+For learning and interviews, Expand Around Center is often the best balance between simplicity and efficiency.
+
+It is:
+
+```
+O(n²) time
+O(1) auxiliary space
+```
+
+For the given constraint:
+
+```
+n <= 1000
+```
+
+O(n²) is completely reasonable.
+
+Manacher's Algorithm is theoretically faster:
+
+```
+O(n)
+```
+
+but it is considerably more complicated.
+
+Key Lessons
+
+1. Every palindrome has a center.
+
+2. There are two types of palindrome centers:
+
+   ```
+   Odd:
+   (center, center)
+
+   Even:
+   (center, center + 1)
+   ```
+
+3. Expanding around the center avoids generating every possible substring.
+
+4. Storing indices instead of substrings reduces auxiliary space.
+
+5. The brute-force approach is O(n³) because there are O(n²) substrings and palindrome checking can take O(n).
+
+6. Expand Around Center improves the time complexity to O(n²).
+
+7. Expand Around Center uses O(1) auxiliary space.
+
+8. Manacher's Algorithm can further reduce the time complexity to O(n), but it is substantially more advanced.
+
+Final Takeaway
+
+The progression for this problem is:
+
+```
+Brute Force
+    ↓
+O(n³) time
+O(n) auxiliary space
+
+    ↓ optimization
+
+Expand Around Center
+    ↓
+O(n²) time
+O(1) auxiliary space
+
+    ↓ advanced optimization
+
+Manacher's Algorithm
+    ↓
+O(n) time
+O(n) auxiliary space
+```
+
+The Expand Around Center solution is the practical solution to master first because it provides a strong improvement while remaining easy to derive, explain, and implement.
+
+Manacher's Algorithm should be treated as an advanced optimization rather than a requirement for completing this problem.
